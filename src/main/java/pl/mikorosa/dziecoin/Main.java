@@ -1,5 +1,7 @@
 package pl.mikorosa.dziecoin;
 
+import pl.mikorosa.dziecoin.gui.MainFrame;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,5 +58,8 @@ public class Main {
         System.out.println("Wallet 1: " + blockchain.getAddressBalance(w1.getAddress()));
         System.out.println("Wallet 2: " + blockchain.getAddressBalance(w2.getAddress()));
         System.out.println("Wallet 3: " + blockchain.getAddressBalance(w3.getAddress()));
+
+        MainFrame mf = new MainFrame();
+        mf.setVisible(true);
     }
 }
