@@ -1,5 +1,6 @@
 package pl.mikorosa.dziecoin;
 
+import pl.mikorosa.dziecoin.database.DatabaseConnection;
 import pl.mikorosa.dziecoin.gui.MainFrame;
 
 import java.util.ArrayList;
@@ -8,8 +9,15 @@ import java.util.List;
 public class Main {
     public static int difficulty;
     public static Blockchain blockchain;
+    public static DatabaseConnection db;
 
     public static void main(String[] args) {
+        db = new DatabaseConnection();
+
+        System.out.println(db.query("SELECT * FROM blocks"));
+        System.out.println(db.query("SELECT * FROM transactions"));
+        System.out.println(db.query("SELECT * FROM nfts"));
+
         Wallet w1 = new Wallet();
         Wallet w2 = new Wallet();
         Wallet w3 = new Wallet();
