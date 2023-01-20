@@ -14,9 +14,9 @@ public class Main {
     public static void main(String[] args) {
         db = new DatabaseConnection();
 
-        System.out.println(db.query("SELECT * FROM blocks"));
-        System.out.println(db.query("SELECT * FROM transactions"));
-        System.out.println(db.query("SELECT * FROM nfts"));
+        System.out.println(db.getBlocksTable().select());
+        System.out.println(db.getTransactionsTable().select());
+        System.out.println(db.getNFTsTable().select());
 
         Wallet w1 = new Wallet();
         Wallet w2 = new Wallet();

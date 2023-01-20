@@ -9,12 +9,19 @@ import java.util.Map;
 public class DatabaseConnection {
     private Connection connection = null;
     private Statement statement = null;
+    private DatabaseBlocks blocks;
+    private DatabaseTransactions transactions;
+    private DatabaseNFTs nfts;
     public DatabaseConnection() {
         System.out.println("Connecting to database...");
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://helium.mikorosa.pl:3306/dziecoin", "dziecoin", "Y6seMx#HwgYU");
             System.out.println("Connected");
+
+            blocks = new DatabaseBlocks();
+            transactions = new DatabaseTransactions();
+            nfts = new DatabaseNFTs();
         } catch(ClassNotFoundException e) {
             System.out.println("Error while setting up JDBC driver: " + e.getMessage());
             e.printStackTrace();
@@ -22,6 +29,18 @@ public class DatabaseConnection {
             System.out.println("Error while connecting to database: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public DatabaseBlocks getBlocksTable() {
+        return blocks;
+    }
+
+    public DatabaseTransactions getTransactionsTable() {
+        return transactions;
+    }
+
+    public DatabaseNFTs getNFTsTable() {
+        return nfts;
     }
 
     public List<Map<String, Object>> query(String sql) {
