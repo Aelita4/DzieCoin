@@ -9,6 +9,7 @@ import java.util.List;
 public class Main {
     public static int difficulty;
     public static Blockchain blockchain;
+    public static MainFrame mainFrame;
     public static DatabaseConnection db;
 
     public static void main(String[] args) {
@@ -24,6 +25,9 @@ public class Main {
 
         difficulty = 4;
         blockchain = new Blockchain(w1.getAddress());
+
+        mainFrame = new MainFrame();
+        mainFrame.setVisible(true);
 
         NFT n1 = new NFT(w1.getAddress(), "licencja na wozek widlowy");
 
@@ -66,8 +70,5 @@ public class Main {
         System.out.println("Wallet 1: " + blockchain.getAddressBalance(w1.getAddress()));
         System.out.println("Wallet 2: " + blockchain.getAddressBalance(w2.getAddress()));
         System.out.println("Wallet 3: " + blockchain.getAddressBalance(w3.getAddress()));
-
-        MainFrame mf = new MainFrame();
-        mf.setVisible(true);
     }
 }

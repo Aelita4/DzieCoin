@@ -69,6 +69,7 @@ public class Blockchain {
         }
         blocks.add(block);
         length++;
+        if(length != 1 && Main.mainFrame != null) Main.mainFrame.onNewBlockUpdate();
     }
 
     public int getAddressBalance(String walletAddress) {

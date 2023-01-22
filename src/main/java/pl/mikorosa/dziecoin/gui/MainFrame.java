@@ -78,26 +78,145 @@ public class MainFrame extends JFrame {
         mineBlockTree.setModel(model);
 
         sendSubmit.addActionListener(e -> {
+            String sendTo = recipient.getText();
+            int howMuch;
+            if(sendTo.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Input correct wallet address");
+                return;
+            }
+            try {
+                howMuch = Integer.parseInt(amountToSend.getText());
+                if(howMuch <= 0) throw new NumberFormatException("Value cannot be lower or equal to 0");
+            } catch(NumberFormatException er) {
+                JOptionPane.showMessageDialog(null, "Input correct amount greater than 0");
+                return;
+            }
+            if(bc.getAddressBalance(addr) - howMuch < 0 || howMuchLeftToSpend - howMuch < 0) {
+                JOptionPane.showMessageDialog(null, "Transaction reverted, not enough funds");
+                return;
+            }
 
+            DefaultMutableTreeNode a = new DefaultMutableTreeNode("Transaction");
+            transactions.add(new Transaction(addr, sendTo, howMuch));
+
+            a.add(new DefaultMutableTreeNode("Sender: " + addr));
+            a.add(new DefaultMutableTreeNode("Recipient: " + sendTo));
+            a.add(new DefaultMutableTreeNode("Amount: " + howMuch));
+
+            rootMineBlock.add(a);
+            DefaultTreeModel model14 = new DefaultTreeModel(rootMineBlock);
+            mineBlockTree.setModel(model14);
+            JOptionPane.showMessageDialog(null, "Transaction created, mine block to add it to blockchain");
+            howMuchLeftToSpend -= howMuch;
+            mineBlockButton.setEnabled(true);
+            clearButton.setEnabled(true);
+            mineBlockButton.setText("Mine block");
         });
 
         validateChainButton.addActionListener(e -> {
+            Block.VerifyCodes status = bc.validateChain();
 
+            if(status == Block.VerifyCodes.SUCCESS) JOptionPane.showMessageDialog(null, "Chain is valid", "Verification", JOptionPane.INFORMATION_MESSAGE);
+            else if(status == Block.VerifyCodes.HASH_MISMATCH) JOptionPane.showMessageDialog(null, "Hash mismatch found", "Verification", JOptionPane.ERROR_MESSAGE);
+            else if(status == Block.VerifyCodes.INVALID_POW_SIGNATURE) JOptionPane.showMessageDialog(null, "Invalid proof of work signature found", "Verification", JOptionPane.ERROR_MESSAGE);
+            else if(status == Block.VerifyCodes.INVALID_BLOCK_HASH) JOptionPane.showMessageDialog(null, "Invalid block hash found", "Verification", JOptionPane.ERROR_MESSAGE);
         });
-
         payForTuitionButton.addActionListener(e -> {
+            int input = JOptionPane.showConfirmDialog(null, "6 DC will be sent to pay tuition\nAre you sure?", "Payment Confirmation", JOptionPane.YES_NO_OPTION);
+            if(input == JOptionPane.YES_OPTION) {
+                if(bc.getAddressBalance(addr) - 6 < 0 || howMuchLeftToSpend - 6 < 0) JOptionPane.showMessageDialog(null, "Transaction reverted, not enough funds");
+                else {
+                    DefaultMutableTreeNode a = new DefaultMutableTreeNode("Transaction");
 
+                    a.add(new DefaultMutableTreeNode("Sender: " + addr));
+                    a.add(new DefaultMutableTreeNode("Recipient: wsiz"));
+                    a.add(new DefaultMutableTreeNode("Amount: 6"));
+
+                    rootMineBlock.add(a);
+                    DefaultTreeModel model13 = new DefaultTreeModel(rootMineBlock);
+                    mineBlockTree.setModel(model13);
+
+                    transactions.add(new Transaction(addr, "wsiz", 6));
+
+                    JOptionPane.showMessageDialog(null, "Transaction created, mine block to add it to blockchain");
+                    howMuchLeftToSpend -= 6;
+                    mineBlockButton.setEnabled(true);
+                    clearButton.setEnabled(true);
+                    mineBlockButton.setText("Mine block");
+                }
+            }
         });
         payForAdvanceButton.addActionListener(e -> {
+            int input = JOptionPane.showConfirmDialog(null, "1 DC will be sent to pay advance\nAre you sure?", "Payment Confirmation", JOptionPane.YES_NO_OPTION);
+            if(input == JOptionPane.YES_OPTION) {
+                if(bc.getAddressBalance(addr) - 1 < 0 || howMuchLeftToSpend - 1 < 0) JOptionPane.showMessageDialog(null, "Transaction reverted, not enough funds");
+                else {
+                    DefaultMutableTreeNode a = new DefaultMutableTreeNode("Transaction");
 
+                    a.add(new DefaultMutableTreeNode("Sender: " + addr));
+                    a.add(new DefaultMutableTreeNode("Recipient: wsiz"));
+                    a.add(new DefaultMutableTreeNode("Amount: 1"));
+
+                    rootMineBlock.add(a);
+                    DefaultTreeModel model12 = new DefaultTreeModel(rootMineBlock);
+                    mineBlockTree.setModel(model12);
+
+                    transactions.add(new Transaction(addr, "wsiz", 1));
+
+                    JOptionPane.showMessageDialog(null, "Transaction created, mine block to add it to blockchain");
+                    howMuchLeftToSpend -= 1;
+                    mineBlockButton.setEnabled(true);
+                    clearButton.setEnabled(true);
+                    mineBlockButton.setText("Mine block");
+                }
+            }
         });
 
         mineBlockButton.addActionListener(e -> {
+            mineBlockButton.setEnabled(false);
+            clearButton.setEnabled(false);
+            Block block = new Block(bc.getLatestBlock().getHash(), bc.getLength() + 1, transactions);
 
+            for (NFT nft : nfts) {
+                block.addNFT(nft);
+            }
+
+            rootMineBlock.removeAllChildren();
+            mineBlockButton.setText("Mining, please wait...");
+            block.mineBlock();
+            mineBlockButton.setText("Mine block");
+            JOptionPane.showMessageDialog(null, "Block mined successfully");
+
+            try {
+                bc.addBlock(block);
+            } catch (BlockchainIntegrityException er) {
+                JOptionPane.showMessageDialog(null, "Unable to add a block: " + er.getMessage(), "Fatal error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            transactions.clear();
+
+            howMuchLeftToSpend = bc.getAddressBalance(addr);
+
+            rootMineBlock.removeAllChildren();
+            DefaultTreeModel model1 = new DefaultTreeModel(rootMineBlock);
+            mineBlockTree.setModel(model1);
         });
 
         clearButton.addActionListener(e -> {
+            int input = JOptionPane.showConfirmDialog(null, "All pending transactions will be cancelled\nAre you sure?", "Clear Confirmation", JOptionPane.YES_NO_OPTION);
+            if(input == JOptionPane.YES_OPTION) {
+                mineBlockButton.setEnabled(false);
+                clearButton.setEnabled(false);
 
+                transactions.clear();
+
+                howMuchLeftToSpend = bc.getAddressBalance(addr);
+
+                rootMineBlock.removeAllChildren();
+                DefaultTreeModel model1 = new DefaultTreeModel(rootMineBlock);
+                mineBlockTree.setModel(model1);
+            }
         });
 
         exportButton.addActionListener(e -> {
@@ -105,7 +224,26 @@ public class MainFrame extends JFrame {
         });
 
         createMintNFTButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Input data for NFT: ");
+            if(input != null && !input.isEmpty()) {
+                NFT n = new NFT(addr, input);
+                nfts.add(n);
 
+                DefaultMutableTreeNode a = new DefaultMutableTreeNode("NFT");
+
+                a.add(new DefaultMutableTreeNode("Contract: " + n.getContract()));
+                a.add(new DefaultMutableTreeNode("Owner: " + addr));
+                a.add(new DefaultMutableTreeNode("Data: " + input));
+
+                rootMineBlock.add(a);
+                DefaultTreeModel model13 = new DefaultTreeModel(rootMineBlock);
+                mineBlockTree.setModel(model13);
+
+                JOptionPane.showMessageDialog(null, "NFT minted, mine block to add it to blockchain");
+                mineBlockButton.setEnabled(true);
+                clearButton.setEnabled(true);
+                mineBlockButton.setText("Mine block");
+            }
         });
     }
 
