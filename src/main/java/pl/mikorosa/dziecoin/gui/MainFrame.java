@@ -121,6 +121,7 @@ public class MainFrame extends JFrame {
             else if(status == Block.VerifyCodes.INVALID_POW_SIGNATURE) JOptionPane.showMessageDialog(null, "Invalid proof of work signature found", "Verification", JOptionPane.ERROR_MESSAGE);
             else if(status == Block.VerifyCodes.INVALID_BLOCK_HASH) JOptionPane.showMessageDialog(null, "Invalid block hash found", "Verification", JOptionPane.ERROR_MESSAGE);
         });
+
         payForTuitionButton.addActionListener(e -> {
             int input = JOptionPane.showConfirmDialog(null, "6 DC will be sent to pay tuition\nAre you sure?", "Payment Confirmation", JOptionPane.YES_NO_OPTION);
             if(input == JOptionPane.YES_OPTION) {
@@ -146,6 +147,7 @@ public class MainFrame extends JFrame {
                 }
             }
         });
+
         payForAdvanceButton.addActionListener(e -> {
             int input = JOptionPane.showConfirmDialog(null, "1 DC will be sent to pay advance\nAre you sure?", "Payment Confirmation", JOptionPane.YES_NO_OPTION);
             if(input == JOptionPane.YES_OPTION) {
@@ -220,7 +222,27 @@ public class MainFrame extends JFrame {
         });
 
         exportButton.addActionListener(e -> {
+            int bitfield = 0;
+            if(exportBlockDataCheckBox.isSelected()) bitfield |= Blockchain.ExportType.BLOCK.value;
+            if(exportTransactionDataCheckBox.isSelected()) bitfield |= Blockchain.ExportType.TRANSACTION.value;
+            if(exportNFTDataCheckBox.isSelected()) bitfield |= Blockchain.ExportType.NFT.value;
 
+            if(bitfield == 0) {
+                JOptionPane.showMessageDialog(null, "Select something to export");
+                return;
+            }
+
+            try {
+                bc.exportData(bitfield);
+                int count = Integer.bitCount(bitfield);
+                JOptionPane.showMessageDialog(null, "Successfully exported " + count + " file" + ((count > 1) ? "s" : ""));
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Failed to export data:\n" + ex.getMessage());
+            }
+
+            exportBlockDataCheckBox.setSelected(false);
+            exportTransactionDataCheckBox.setSelected(false);
+            exportNFTDataCheckBox.setSelected(false);
         });
 
         createMintNFTButton.addActionListener(e -> {

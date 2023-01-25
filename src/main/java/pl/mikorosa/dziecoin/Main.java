@@ -15,16 +15,12 @@ public class Main {
     public static void main(String[] args) {
         db = new DatabaseConnection();
 
-        System.out.println(db.getBlocksTable().select());
-        System.out.println(db.getTransactionsTable().select());
-        System.out.println(db.getNFTsTable().select());
-
         Wallet w1 = new Wallet();
         Wallet w2 = new Wallet();
         Wallet w3 = new Wallet();
 
         difficulty = 4;
-        blockchain = new Blockchain(w1.getAddress());
+        blockchain = new Blockchain(w1.getAddress(), false);
 
         mainFrame = new MainFrame();
         mainFrame.setVisible(true);
@@ -58,17 +54,5 @@ public class Main {
         } catch (BlockchainIntegrityException e) {
             System.out.println("Blockchain Integrity Exception: " + e.getMessage());
         }
-
-        for (Block block : blockchain.getBlocks()) {
-            System.out.println("Block " + block.getHeight() + ": " + block.getHash());
-            for (Transaction transaction : block.getTransactions()) {
-                System.out.println("    " + transaction.getSender() + " => " + transaction.getRecipient() + " - " + transaction.getAmount());
-            }
-        }
-
-        System.out.println("Balances:");
-        System.out.println("Wallet 1: " + blockchain.getAddressBalance(w1.getAddress()));
-        System.out.println("Wallet 2: " + blockchain.getAddressBalance(w2.getAddress()));
-        System.out.println("Wallet 3: " + blockchain.getAddressBalance(w3.getAddress()));
     }
 }
