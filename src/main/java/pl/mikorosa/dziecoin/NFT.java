@@ -1,8 +1,7 @@
 package pl.mikorosa.dziecoin;
 
-public class NFT {
+public class NFT extends BlockData {
     private String contract;
-    private String owner;
     private String data;
 
     public NFT(String owner, String data) {
@@ -22,11 +21,7 @@ public class NFT {
     public String getContract() {
         return contract;
     }
-
-    public String getOwner() {
-        return owner;
-    }
-
+    
     public String getData() {
         return data;
     }
