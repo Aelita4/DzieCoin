@@ -21,7 +21,7 @@ public class NFT extends BlockData {
     public String getContract() {
         return contract;
     }
-    
+
     public String getData() {
         return data;
     }
