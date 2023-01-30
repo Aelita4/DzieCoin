@@ -197,6 +197,7 @@ public class MainFrame extends JFrame {
             }
 
             transactions.clear();
+            nfts.clear();
 
             howMuchLeftToSpend = bc.getAddressBalance(addr);
 
